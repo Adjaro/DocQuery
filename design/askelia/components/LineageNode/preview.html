@@ -1,0 +1,14 @@
+<!-- @dsCard group="Lignage" height=140 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>LineageNode</title></head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement,A=window.Askelia;
+function D(){var s=React.useState('g'),a=s[0],set=s[1];function n(k,p){return h(A.LineageNode,Object.assign({selected:a===k,onClick:function(){set(k)},style:{width:180}},p))}
+return h('div',{className:'ak-row',style:{padding:20,gap:16}},n('s',{layer:'source',label:'PMSI',name:'RUM_DIAG',rows:'18,2 M'}),n('b',{layer:'bronze',label:'stg_pmsi',name:'rum_diag',rows:'18,2 M'}),n('v',{layer:'silver',label:'slv',name:'diagnostic_sejour',rows:'18,4 M',warn:true}),n('g',{layer:'gold',label:'OMOP',name:'condition_occurrence',rows:'17,7 M'}));}
+ReactDOM.createRoot(document.getElementById('root')).render(h(D));
+</script>
+</body>
+</html>

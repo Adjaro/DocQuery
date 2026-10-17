@@ -1,0 +1,18 @@
+<!-- @dsCard group="Réponses" height=200 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Citation</title></head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement,A=window.Askelia;
+function D(){var s=React.useState(1),a=s[0],set=s[1];
+return h('div',{style:{padding:20,maxWidth:520}},
+ h('p',{style:{margin:'0 0 8px'}},"C'est la date de sortie du RUM ",h('button',{className:'ak-ref','aria-pressed':a===1,onClick:function(){set(1)}},'1'),' ; un code inconnu est écarté ',h('button',{className:'ak-ref','aria-pressed':a===2,onClick:function(){set(2)}},'2'),'.'),
+ h('div',{style:{margin:'0 -12px'}},
+ h(A.Citation,{n:1,source:'Spec_ETL_PMSI_v3.2.pdf',location:'p. 14, §3.2',active:a===1,onClick:function(){set(1)}}),
+ h(A.Citation,{n:2,source:'Spec_ETL_PMSI_v3.2.pdf',location:'p. 14, §3.3',quote:'Un code absent du référentiel de l\'année est rejeté.',active:a===2,onClick:function(){set(2)}})));}
+ReactDOM.createRoot(document.getElementById('root')).render(h(D));
+</script>
+</body>
+</html>

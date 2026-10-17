@@ -1,0 +1,101 @@
+<!-- @dsCard group="Écrans" height=1280 width=1440 page subtitle="ETL & Lignage — réponse sourcée et schéma de lignage cliquable" -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>ETL & Lignage</title>
+<style>
+.pg { max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px; }
+.conv { max-width: 760px; display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+.ak-you { align-self: flex-start; }
+.ak-answer ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.graph { margin-top: 40px; border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.graph-hd { display: flex; align-items: center; gap: 12px; padding: 12px 16px 12px 20px; border-bottom: 1px solid var(--border); }
+.canvas { position: relative; height: 340px; margin: 0 20px; }
+.canvas svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.wire { fill: none; stroke: var(--border-strong); stroke-width: 1.25; }
+.wire-on { stroke: var(--accent); stroke-width: 1.75; }
+.wire-rej { stroke: var(--danger); stroke-dasharray: 4 4; }
+.wl { position: absolute; transform: translate(-50%, -50%); font-size: 12px; line-height: 16px; color: var(--ink-3); background: var(--surface); padding: 1px 4px; white-space: nowrap; }
+.wl-rej { color: var(--danger); }
+.colh { position: absolute; top: 20px; font-size: 12px; color: var(--ink-3); }
+.np { position: absolute; }
+.canvas .ak-node-name { font-size: 12px; }
+.rej { width: 178px; border: 1px dashed var(--danger); border-radius: var(--radius-md); padding: 8px 12px; font-size: 12px; color: var(--danger); }
+.rej b { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 12.5px; color: var(--ink); margin-top: 2px; }
+.detail { border-top: 1px solid var(--border); padding: 20px; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 40px; }
+.detail h3 { font-size: 13px; font-weight: 500; color: var(--ink-3); margin: 0 0 8px; }
+.rules { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 20px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); }
+</style></head>
+<body>
+<div class="ak-app" data-active="etl"><main class="ak-main">
+<div class="pg">
+  <div class="ak-crumb">ETL & Lignage</div>
+  <div class="conv">
+    <div class="ak-you">D'où viennent les diagnostics dans condition_occurrence ?</div>
+    <div class="ak-answer">
+      <p>Ils proviennent de deux systèmes, réunis dans la couche silver puis traduits en OMOP :</p>
+      <ol>
+        <li><b>PMSI MCO</b> : diagnostics principaux et associés des RUM, envoyés chaque mois par le DIM (96 % des lignes) <button class="ak-ref">1</button></li>
+        <li><b>Urgences</b> : diagnostic principal des passages sans hospitalisation, chaque jour <button class="ak-ref">2</button></li>
+      </ol>
+      <p>Les codes CIM-10 sont convertis en concepts SNOMED standard. Ceux absents du référentiel ATIH sont écartés (3,8 % en septembre) <button class="ak-ref">3</button>.</p>
+      <div id="meta"></div>
+    </div>
+  </div>
+
+  <section class="graph">
+    <div class="graph-hd"><h2 class="ak-h2">Lignage</h2><span class="ak-muted" style="font-size:13px">Cliquez sur une table pour voir ses colonnes et règles</span><span class="ak-spacer"></span><button class="ak-btn ak-btn-sm">Ouvrir en plein écran</button></div>
+    <div class="canvas" id="canvas"><svg id="wires"></svg></div>
+    <div class="detail" id="detail"></div>
+  </section>
+</div>
+</main></div>
+<script>
+Askelia.mountShell(document.querySelector('.ak-app'));
+var h = React.createElement, A = Askelia;
+ReactDOM.createRoot(document.getElementById('meta')).render(h(A.AnswerMeta, { sources: 3, reliability: 'élevée', verifyLabel: 'Vérifier dans le code dbt', steps: ['Recherche des modèles dbt qui écrivent dans condition_occurrence', 'Remontée des dépendances jusqu\'aux sources', 'Lecture des règles dans Spec_ETL_PMSI_v3.2 (§3.2 et §3.3)'] }));
+var NW = 178, NH = 78;
+var N = {
+  rum: { c: 0, y: 64, layer: 'source', label: 'PMSI', name: 'RUM_DIAG', rows: '18,2 M' },
+  rpu: { c: 0, y: 180, layer: 'source', label: 'Urgences', name: 'RPU_DIAG', rows: '0,9 M' },
+  b1: { c: 1, y: 64, layer: 'bronze', label: 'stg_pmsi', name: 'rum_diag', rows: '18,2 M' },
+  b2: { c: 1, y: 180, layer: 'bronze', label: 'stg_urg', name: 'rpu_diag', rows: '0,9 M' },
+  s: { c: 2, y: 128, layer: 'silver', label: 'slv', name: 'diagnostic_sejour', rows: '18,4 M', warn: true },
+  g: { c: 3, y: 128, layer: 'gold', label: 'OMOP', name: 'condition_occurrence', rows: '17,7 M' }
+};
+var E = [['rum', 'b1', 'copie mensuelle'], ['rpu', 'b2', 'flux quotidien'], ['b1', 's', 'codes normalisés'], ['b2', 's', 'dédoublonnage'], ['s', 'g', 'vers SNOMED']];
+var D = {
+  g: { cols: [['condition_concept_id', 'Concept SNOMED (relation « Maps to »)'], ['condition_source_value', 'Code CIM-10 d\'origine'], ['condition_status_concept_id', 'Principal 32902 · associé 32908'], ['condition_start_date', 'Date de sortie du séjour']], rules: ['Une ligne par séjour, code et statut.', 'Code non traduit : concept 0 (1,3 %).', 'Chargement incrémental chaque nuit.'] },
+  s: { cols: [['id_sejour', 'Identifiant séjour commun aux deux sources'], ['code_cim10', 'Majuscules, sans point'], ['type_diag', 'DP, DA ou DR']], rules: ['Rejet si le code est absent du référentiel ATIH de l\'année.', 'Contrôle à surveiller : moins de diagnostics associés en cardiologie depuis août.'] }
+};
+var sel = 'g', canvas = document.getElementById('canvas'), roots = {};
+function X(c) { return c * (NW + (canvas.clientWidth - 4 * NW) / 3); }
+['Sources', 'Bronze', 'Silver', 'Gold'].forEach(function (t, i) { var d = document.createElement('div'); d.className = 'colh'; d.style.left = X(i) + 'px'; d.textContent = t; canvas.appendChild(d); });
+Object.keys(N).forEach(function (k) { var el = document.createElement('div'); el.className = 'np'; el.style.left = X(N[k].c) + 'px'; el.style.top = N[k].y + 'px'; canvas.appendChild(el); roots[k] = ReactDOM.createRoot(el); });
+var rj = document.createElement('div'); rj.className = 'np'; rj.style.left = X(2) + 'px'; rj.style.top = '262px'; rj.innerHTML = '<div class="rej">Rejets · 3,8 %<b>rej_pmsi_diag</b></div>'; canvas.appendChild(rj);
+function detail(k) {
+  var d = D[k] || { cols: [], rules: ['Documentation à compléter.'] };
+  document.getElementById('detail').innerHTML = '<div><h3>Colonnes de <span class="ak-mono" style="color:var(--ink)">' + N[k].name + '</span></h3><table class="ak-table"><tbody>' +
+    d.cols.map(function (c) { return '<tr><td class="ak-mono" style="font-size:13px;width:44%">' + c[0] + '</td><td class="ak-ink2">' + c[1] + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+    '<div><h3>Règles appliquées</h3><ul class="rules">' + d.rules.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></div>';
+}
+function draw() {
+  Object.keys(N).forEach(function (k) { roots[k].render(h(A.LineageNode, Object.assign({}, N[k], { style: { width: NW }, selected: k === sel, onClick: function () { sel = k; draw(); detail(k); } }))); });
+  canvas.querySelectorAll('.wl').forEach(function (l) { l.remove(); });
+  var svg = '<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8z" style="fill:var(--border-strong)"/></marker><marker id="ao" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8z" style="fill:var(--accent)"/></marker><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8z" style="fill:var(--danger)"/></marker></defs>';
+  function lab(x, y, t, c) { var l = document.createElement('div'); l.className = 'wl ' + (c || ''); l.style.left = x + 'px'; l.style.top = y + 'px'; l.textContent = t; canvas.appendChild(l); }
+  E.forEach(function (e) {
+    var a = N[e[0]], b = N[e[1]], on = e[0] === sel || e[1] === sel;
+    var x1 = X(a.c) + NW, y1 = a.y + NH / 2, x2 = X(b.c) - 2, y2 = b.y + NH / 2, m = (x1 + x2) / 2;
+    svg += '<path class="wire' + (on ? ' wire-on' : '') + '" marker-end="url(#' + (on ? 'ao' : 'a') + ')" d="M' + x1 + ' ' + y1 + ' C' + m + ' ' + y1 + ' ' + m + ' ' + y2 + ' ' + x2 + ' ' + y2 + '"/>';
+    lab(m, a.y === b.y ? y1 - 12 : (y1 + y2) / 2, e[2]);
+  });
+  var sx = X(2) + NW / 2;
+  svg += '<path class="wire wire-rej" marker-end="url(#ar)" d="M' + sx + ' ' + (N.s.y + NH) + ' L' + sx + ' 260"/>';
+  lab(sx, (N.s.y + NH + 260) / 2, 'code inconnu', 'wl-rej');
+  document.getElementById('wires').innerHTML = svg;
+}
+draw(); detail('g');
+Askelia.hydrateIcons();
+</script>
+</body>
+</html>

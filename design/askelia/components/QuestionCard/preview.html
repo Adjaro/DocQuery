@@ -1,0 +1,14 @@
+<!-- @dsCard group="Formulaires" height=420 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>QuestionCard</title></head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement,A=window.Askelia;
+ReactDOM.createRoot(document.getElementById('root')).render(h('div',{style:{padding:'0 20px',maxWidth:720}},
+ h(A.QuestionCard,{title:'Quelle date situe un séjour « en 2024 » ?',help:'Elle sert aussi de point de départ aux 30 jours.',defaultValue:'entree',options:[{value:'entree',label:"Date d'entrée"},{value:'sortie',label:'Date de sortie'},{value:'acte',label:"Date de l'acte"}]}),
+ h(A.QuestionCard,{title:"Codes de l'insuffisance cardiaque",help:'Nombre de séjours 2024 dans eds_prod.',freeText:'Ajouter un code CIM-10 ou un concept_id',codes:[{code:'I50.0',label:'Insuffisance cardiaque congestive',count:'4 212'},{code:'I50.9',label:'Insuffisance cardiaque, sans précision',count:'3 117'},{code:'I11.0',label:'Cardiopathie hypertensive avec IC',count:'611',selected:false}]})));
+</script>
+</body>
+</html>

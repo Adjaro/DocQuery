@@ -1,0 +1,12 @@
+<!-- @dsCard group="Réponses" height=150 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>AnswerMeta</title></head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement,A=window.Askelia;
+ReactDOM.createRoot(document.getElementById('root')).render(h('div',{style:{padding:20,maxWidth:640}},h(A.AnswerMeta,{sources:3,reliability:'élevée',open:true,verifyLabel:'Vérifier dans le code dbt',steps:['Recherche des modèles dbt qui écrivent dans condition_occurrence','Remontée des dépendances jusqu\'aux sources','Lecture des règles dans la spécification PMSI']})));
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!-- @dsCard group="Écrans" height=1420 width=1440 page subtitle="Cohortes & SQL — critères, entonnoir et SQL commenté" -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Cohorte — résultat</title>
+<style>
+.pg { max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px; }
+.hd { display: flex; align-items: flex-start; gap: 8px; }
+.hd .ak-h1 { margin-top: 6px; }
+.sub { margin: 6px 0 0; font-size: 13px; color: var(--ink-3); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin: 36px 0 40px; }
+.blk h2 { margin-bottom: 14px; }
+.crit { list-style: none; margin: 0; padding: 0; }
+.crit li { display: grid; grid-template-columns: 40px 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 14px; line-height: 21px; }
+.crit li:first-child { border-top: 0; }
+.op { font-size: 12px; font-weight: 600; color: var(--ink-3); padding-top: 1px; }
+.op-x { color: var(--danger); }
+.crit .det { display: block; font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+.or { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.or em { font-style: normal; font-size: 12px; color: var(--ink-3); }
+.grp { font-size: 12px; font-weight: 500; color: var(--ink-3); margin: 16px 0 2px; }
+.grp:first-of-type { margin-top: 0; }
+.fun { display: flex; flex-direction: column; gap: 14px; }
+.fs { display: grid; grid-template-columns: 1fr 64px; gap: 6px 12px; font-size: 13.5px; }
+.fs .v { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.tr { grid-column: 1 / -1; height: 8px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
+.tr i { display: block; height: 100%; background: var(--border-strong); border-radius: 4px; }
+.fs-last .tr i { background: var(--accent); }
+.fs-last .v, .fs-last span { font-weight: 600; }
+.fs .lost { font-size: 12.5px; color: var(--ink-3); font-weight: 400; margin-left: 6px; }
+</style></head>
+<body>
+<div class="ak-app" data-active="cohortes"><main class="ak-main">
+<div class="pg">
+  <div class="ak-crumb">Cohortes & SQL <i data-i="right" class="ak-ico-sm"></i> Cardiologie</div>
+  <div class="hd">
+    <div style="flex:1">
+      <h1 class="ak-h1">Insuffisance cardiaque 2024 – réhospitalisation à 30 jours</h1>
+      <p class="sub">Version 3 · modifiée il y a 12 min · <span class="ak-status ak-status-verifier" style="font-size:13px">À relire</span></p>
+    </div>
+    <button class="ak-btn"><i data-i="edit"></i>Modifier</button>
+    <button class="ak-btn"><i data-i="download"></i>Exporter .sql</button>
+    <button class="ak-btn ak-btn-primary">Enregistrer dans la bibliothèque</button>
+    <button class="ak-iconbtn" aria-label="Plus d'actions"><i data-i="more"></i></button>
+  </div>
+
+  <div class="grid">
+    <section class="blk">
+      <h2 class="ak-h2">Définition</h2>
+      <div class="grp">Inclure les patients qui ont</div>
+      <ul class="crit">
+        <li><span class="op"></span><span>une hospitalisation complète entrée en 2024<span class="det">premier séjour de l'année = séjour index</span></span></li>
+        <li><span class="op">ET</span><span>un diagnostic principal d'insuffisance cardiaque<span class="or"><span class="ak-code">I50.0</span><em>ou</em><span class="ak-code">I50.1</span><em>ou</em><span class="ak-code">I50.9</span></span></span></li>
+        <li><span class="op">ET</span><span>plus de 65 ans au séjour index</span></li>
+        <li><span class="op">ET</span><span>une nouvelle hospitalisation 1 à 30 jours après la sortie<span class="det">toutes causes</span></span></li>
+      </ul>
+      <div class="grp">Exclure</div>
+      <ul class="crit">
+        <li><span class="op op-x">SAUF</span><span>décès pendant le séjour index</span></li>
+      </ul>
+    </section>
+    <section class="blk">
+      <h2 class="ak-h2">Patients à chaque étape</h2>
+      <div class="fun">
+        <div class="fs"><span>Séjour 2024 avec insuffisance cardiaque</span><span class="v">6 842</span><span class="tr"><i style="width:100%"></i></span></div>
+        <div class="fs"><span>Plus de 65 ans <span class="lost">−1 451</span></span><span class="v">5 391</span><span class="tr"><i style="width:78.8%"></i></span></div>
+        <div class="fs"><span>Sans décès au séjour <span class="lost">−413</span></span><span class="v">4 978</span><span class="tr"><i style="width:72.8%"></i></span></div>
+        <div class="fs fs-last"><span>Réhospitalisés à 30 jours <span class="lost">−3 694</span></span><span class="v">1 284</span><span class="tr"><i style="width:18.8%"></i></span></div>
+      </div>
+      <p class="ak-muted" style="font-size:13px;margin:20px 0 0">Calculé sur eds_prod le 17/10/2026 à 10:42 · 4,8 s</p>
+    </section>
+  </div>
+
+  <div id="sql"></div>
+  <div id="meta" style="margin-top:14px"></div>
+</div>
+</main></div>
+<script>
+Askelia.mountShell(document.querySelector('.ak-app'));
+var sql = [
+"-- Cohorte : insuffisance cardiaque 2024, réhospitalisation à 30 jours (v3)",
+"",
+"-- 1. Séjours 2024 avec diagnostic principal d'insuffisance cardiaque",
+"WITH sejours_ic AS (",
+"  SELECT vo.person_id, vo.visit_occurrence_id,",
+"         vo.visit_start_date, vo.visit_end_date, vo.discharged_to_concept_id",
+"  FROM omop.visit_occurrence vo",
+"  JOIN omop.condition_occurrence co",
+"    ON co.visit_occurrence_id = vo.visit_occurrence_id",
+"  WHERE vo.visit_concept_id = 9201                          -- hospitalisation complète",
+"    AND vo.visit_start_date BETWEEN DATE '2024-01-01' AND DATE '2024-12-31'",
+"    AND co.condition_status_concept_id = 32902              -- diagnostic principal",
+"    AND co.condition_concept_id IN (319835, 444031, 316139) -- I50.0, I50.1, I50.9",
+"),",
+"-- 2. Premier séjour de l'année par patient",
+"sejour_index AS (",
+"  SELECT DISTINCT ON (person_id) *",
+"  FROM sejours_ic",
+"  ORDER BY person_id, visit_start_date",
+"),",
+"-- 3. Plus de 65 ans, sans décès au séjour",
+"index_eligible AS (",
+"  SELECT si.*",
+"  FROM sejour_index si",
+"  JOIN omop.person p USING (person_id)",
+"  WHERE DATE_PART('year', si.visit_start_date) - p.year_of_birth > 65",
+"    AND COALESCE(si.discharged_to_concept_id, 0) <> 4216643",
+"),",
+"-- 4. Réhospitalisation entre J+1 et J+30 après la sortie",
+"rehospit AS (",
+"  SELECT ie.person_id, MIN(vo.visit_start_date) AS date_rehospit",
+"  FROM index_eligible ie",
+"  JOIN omop.visit_occurrence vo",
+"    ON vo.person_id = ie.person_id",
+"   AND vo.visit_concept_id = 9201",
+"   AND vo.visit_start_date BETWEEN ie.visit_end_date + 1 AND ie.visit_end_date + 30",
+"  GROUP BY ie.person_id",
+")",
+"INSERT INTO results.cohort (cohort_definition_id, subject_id, cohort_start_date, cohort_end_date)",
+"SELECT 1042, ie.person_id, ie.visit_start_date, r.date_rehospit",
+"FROM index_eligible ie",
+"JOIN rehospit r USING (person_id);"
+].join("\n");
+var h = React.createElement;
+ReactDOM.createRoot(document.getElementById('sql')).render(h(Askelia.SqlEditor, {
+  sql: sql, title: 'cohorte_ic_2024_v3.sql', dialect: 'PostgreSQL', explain: true, height: 640,
+  blocks: [
+    { line: 3, name: 'sejours_ic', explain: "garde les hospitalisations complètes de 2024 dont le diagnostic principal est l'un des trois codes retenus." },
+    { line: 15, name: 'sejour_index', explain: 'ne garde que le premier de ces séjours pour chaque patient.' },
+    { line: 21, name: 'index_eligible', explain: "calcule l'âge à l'entrée et retire les patients décédés pendant le séjour." },
+    { line: 29, name: 'rehospit', explain: 'cherche une nouvelle hospitalisation dans les 30 jours suivant la sortie.' }
+  ] }));
+ReactDOM.createRoot(document.getElementById('meta')).render(h(Askelia.AnswerMeta, { sources: 3, reliability: 'moyenne — 1 code exclu à confirmer (I11.0)', verifyLabel: 'Vérifier sur 20 dossiers', steps: ['Codes CIM-10 traduits en concepts standard (relation « Maps to »)', 'Séjour index = premier séjour 2024 par patient', 'Fenêtre de 30 jours comptée depuis la date de sortie (convention de la bibliothèque)'] }));
+Askelia.hydrateIcons();
+</script>
+</body>
+</html>

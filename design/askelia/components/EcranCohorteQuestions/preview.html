@@ -1,0 +1,41 @@
+<!-- @dsCard group="Écrans" height=1480 width=1440 page subtitle="Cohortes & SQL — quelques précisions avant d'écrire la requête" -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Cohorte — précisions</title>
+<style>
+.col { max-width: 760px; margin: 0 auto; padding: 40px 24px 0; }
+.req { margin: 16px 0 0; font-size: 18px; line-height: 28px; font-weight: 500; }
+.intro { margin: 32px 0 0; color: var(--ink-2); }
+.qs { margin-top: 8px; }
+.gen { position: sticky; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); margin-top: 16px; }
+.gen-in { max-width: 760px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+</style></head>
+<body>
+<div class="ak-app" data-active="cohortes"><main class="ak-main">
+  <div class="col">
+    <div class="ak-crumb">Cohortes & SQL <i data-i="right" class="ak-ico-sm"></i> Nouvelle cohorte</div>
+    <p class="req">Patients de plus de 65 ans hospitalisés pour insuffisance cardiaque en 2024, avec au moins une réhospitalisation à 30 jours</p>
+    <p class="intro">Quelques précisions avant d'écrire la requête. Les valeurs proposées reprennent les conventions de votre bibliothèque de cohortes.</p>
+    <div class="qs" id="qs"></div>
+    <p class="ak-note" style="margin:8px 0 32px"><b>À savoir :</b> le PMSI de décembre 2024 n'est chargé qu'à 91 %. Une réhospitalisation fin décembre peut manquer.</p>
+  </div>
+  <div class="gen"><div class="gen-in"><span class="ak-muted" style="font-size:13px">Les questions sans réponse utilisent la valeur proposée.</span><span class="ak-spacer"></span><button class="ak-btn ak-btn-ghost">Annuler</button><button class="ak-btn ak-btn-primary">Générer la requête</button></div></div>
+</main></div>
+<script>
+Askelia.mountShell(document.querySelector('.ak-app'));
+var h = React.createElement, Q = Askelia.QuestionCard;
+ReactDOM.createRoot(document.getElementById('qs')).render(h(React.Fragment, null,
+  h(Q, { title: 'Base et dialecte', defaultValue: 'omop', options: [{ value: 'omop', label: 'OMOP CDM · eds_prod', note: 'PostgreSQL' }, { value: 'pmsi', label: 'PMSI brut' }, { value: 'gold', label: 'Entrepôt gold' }] }),
+  h(Q, { title: 'Quelle date situe un séjour « en 2024 » ?', help: 'Elle sert aussi de point de départ aux 30 jours.', defaultValue: 'entree', options: [{ value: 'entree', label: "Date d'entrée" }, { value: 'sortie', label: 'Date de sortie' }, { value: 'acte', label: "Date de l'acte" }] }),
+  h(Q, { title: 'Que comptez-vous ?', help: 'Un patient peut avoir plusieurs séjours en 2024.', defaultValue: 'patient', options: [{ value: 'patient', label: 'Patients', note: 'premier séjour' }, { value: 'sejour', label: 'Séjours' }, { value: 'venue', label: 'Venues' }] }),
+  h(Q, { title: "Codes de l'insuffisance cardiaque", help: 'CIM-10, avec le nombre de séjours 2024 dans eds_prod. Décochez ceux à exclure.', freeText: 'Ajouter un code CIM-10, SNOMED ou un concept_id',
+    codes: [{ code: 'I50.0', label: 'Insuffisance cardiaque congestive', count: '4 212' }, { code: 'I50.1', label: 'Insuffisance ventriculaire gauche', count: '2 908' }, { code: 'I50.9', label: 'Insuffisance cardiaque, sans précision', count: '3 117' }, { code: 'I11.0', label: 'Cardiopathie hypertensive avec insuffisance cardiaque', count: '611', selected: false }] }),
+  h(Q, { title: 'Diagnostic principal ou associé ?', defaultValue: 'dp', options: [{ value: 'dp', label: 'Principal uniquement' }, { value: 'both', label: 'Principal ou associé' }] }),
+  h(Q, { title: 'Quelle réhospitalisation ?', defaultValue: 'toutes', options: [{ value: 'toutes', label: 'Toutes causes' }, { value: 'ic', label: 'Pour insuffisance cardiaque' }] }),
+  h(Q, { title: 'Exclusions', multiple: true, defaultValue: ['deces'], options: [{ value: 'deces', label: 'Décès pendant le séjour' }, { value: 'transfert', label: 'Transferts vers un autre hôpital' }] }),
+  h(Q, { title: 'Résultat attendu', defaultValue: 'table', options: [{ value: 'count', label: 'Comptage' }, { value: 'list', label: 'Liste de patients' }, { value: 'table', label: 'Table de cohorte' }] })
+));
+Askelia.hydrateIcons();
+</script>
+</body>
+</html>

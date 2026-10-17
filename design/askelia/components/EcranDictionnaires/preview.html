@@ -1,0 +1,80 @@
+<!-- @dsCard group="Écrans" height=900 width=1440 page subtitle="Dictionnaires — liste, recherche transversale et fiche détaillée" -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Dictionnaires</title>
+<style>
+.lay { display: grid; grid-template-columns: 1fr 420px; height: 100%; }
+.pg { padding: 32px 40px; overflow: auto; }
+.hd { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-md); max-width: 520px; color: var(--ink-3); }
+.search input { flex: 1; border: 0; outline: none; background: transparent; font-size: 14px; color: var(--ink); }
+.dn b { font-weight: 500; display: block; }
+.dn span { font-size: 13px; color: var(--ink-3); }
+.hits { margin: 28px 0 0; }
+.hits h2 { font-size: 13px; font-weight: 500; color: var(--ink-3); margin: 0 0 6px; }
+.hit { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 10px 12px; margin: 0 -12px; border-radius: var(--radius-md); cursor: pointer; }
+.hit:hover { background: var(--surface-2); }
+.hit[aria-selected="true"] { background: var(--surface-3); }
+.hit .t { font-family: var(--font-mono); font-size: 13px; }
+.hit .d { font-size: 13px; color: var(--ink-3); }
+.hit .s { grid-row: 1 / 3; grid-column: 2; align-self: center; font-size: 13px; color: var(--ink-3); }
+.drawer { border-left: 1px solid var(--border); padding: 24px 28px; overflow: auto; display: flex; flex-direction: column; gap: 20px; }
+.kv { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 10px 12px; font-size: 13.5px; }
+.kv dt { color: var(--ink-3); }
+.kv dd { margin: 0; }
+.sec h3 { font-size: 13px; font-weight: 500; color: var(--ink-3); margin: 0 0 8px; }
+</style></head>
+<body>
+<div class="ak-app" data-active="dictionnaires"><main class="ak-main" style="overflow:hidden">
+<div class="lay">
+  <div class="pg">
+    <div class="hd"><h1 class="ak-h1" style="flex:1">Dictionnaires</h1><button class="ak-btn ak-btn-primary"><i data-i="plus"></i>Ajouter</button></div>
+    <label class="search"><i data-i="search"></i><input value="date de sortie" aria-label="Rechercher dans tous les dictionnaires"></label>
+
+    <div class="hits">
+      <h2>3 résultats pour « date de sortie »</h2>
+      <div class="hit" aria-selected="true"><span class="t">visit_occurrence.visit_end_date</span><span class="s">Dictionnaire OMOP</span><span class="d">Date de fin de la visite ; pour le MCO, date de sortie du séjour.</span></div>
+      <div class="hit"><span class="t">stg_pmsi.rum.dt_sortie</span><span class="s">Schéma staging PMSI</span><span class="d">Date de sortie du RUM, format AAAAMMJJ.</span></div>
+      <div class="hit"><span class="t" style="font-family:var(--font-sans);font-weight:500">Date de sortie</span><span class="s">Glossaire métier</span><span class="d">Date à laquelle le patient quitte l'unité ou l'établissement.</span></div>
+    </div>
+
+    <table class="ak-table" style="margin-top:36px">
+      <thead><tr><th>Nom</th><th>Source</th><th>Version</th><th>Indexé le</th><th class="ak-num">Entrées</th><th>Statut</th></tr></thead>
+      <tbody>
+        <tr><td class="dn"><b>Dictionnaire OMOP</b><span>Tables et colonnes</span></td><td>eds_prod</td><td>5.4</td><td>17 oct. 2026</td><td class="ak-num">2 418</td><td><span class="ak-status ak-status-valide">Indexé</span></td></tr>
+        <tr><td class="dn"><b>CIM-10 FR</b><span>Vocabulaire</span></td><td>ATIH</td><td>2026</td><td>2 mars 2026</td><td class="ak-num">42 917</td><td><span class="ak-status ak-status-valide">Indexé</span></td></tr>
+        <tr><td class="dn"><b>CCAM</b><span>Vocabulaire</span></td><td>Assurance maladie</td><td>v78</td><td>15 sept. 2026</td><td class="ak-num">8 591</td><td><span class="ak-status ak-status-valide">Indexé</span></td></tr>
+        <tr><td class="dn"><b>CCAM → SNOMED</b><span>Table de mapping</span></td><td>Équipe terminologie</td><td>1.3</td><td>—</td><td class="ak-num">8 204</td><td><span class="ak-status ak-status-encours">Indexation 62 %</span></td></tr>
+        <tr><td class="dn"><b>Schéma staging PMSI</b><span>Schéma de base</span></td><td>stg_pmsi</td><td>—</td><td>17 oct. 2026</td><td class="ak-num">312</td><td><span class="ak-status ak-status-valide">Indexé</span></td></tr>
+        <tr><td class="dn"><b>Glossaire métier</b><span>Glossaire</span></td><td>Glossaire_EDS.xlsx</td><td>2026-09</td><td>16 oct. 2026</td><td class="ak-num">612</td><td><span class="ak-status ak-status-erreur">14 lignes invalides</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="drawer" aria-label="Fiche détaillée">
+    <div class="ak-row" style="align-items:flex-start"><div style="flex:1;min-width:0"><p class="ak-over">Colonne · Dictionnaire OMOP</p><h2 class="ak-mono" style="font-size:15px;font-weight:500;margin:4px 0 0;overflow-wrap:anywhere">visit_occurrence.visit_end_date</h2></div><button class="ak-iconbtn" aria-label="Fermer"><i data-i="x"></i></button></div>
+    <p style="margin:0">Date de fin de la visite. Pour une hospitalisation MCO, c'est la date de sortie du séjour (dernier RUM).</p>
+    <dl class="kv">
+      <dt>Type</dt><dd class="ak-mono" style="font-size:13px">DATE, non nul</dd>
+      <dt>Provient de</dt><dd><span class="ak-code">rum.dt_sortie</span></dd>
+      <dt>Règle</dt><dd>Dernière date de sortie des RUM du séjour</dd>
+      <dt>Valeurs nulles</dt><dd>0,02 %</dd>
+      <dt>Étendue</dt><dd>2015 – 2026</dd>
+      <dt>Synonymes</dt><dd>date de sortie, fin de séjour, DS</dd>
+    </dl>
+    <div class="ak-note"><b>Attention :</b> pour les séances (dialyse, chimiothérapie), la date de sortie est égale à la date d'entrée.</div>
+    <div class="sec"><h3>Sources</h3><div id="cites" style="margin:0 -12px"></div></div>
+    <div class="ak-row"><button class="ak-btn ak-btn-sm"><i data-i="lineage"></i>Voir le lignage</button><button class="ak-btn ak-btn-sm">Utiliser dans une cohorte</button></div>
+  </aside>
+</div>
+</main></div>
+<script>
+Askelia.mountShell(document.querySelector('.ak-app'));
+var h = React.createElement;
+ReactDOM.createRoot(document.getElementById('cites')).render(h(React.Fragment, null,
+  h(Askelia.Citation, { n: 1, source: 'Dictionnaire OMOP', location: 'commentaire de colonne' }),
+  h(Askelia.Citation, { n: 2, source: 'Spec_ETL_PMSI_v3.2.pdf', location: 'p. 9, §2.4' })));
+Askelia.hydrateIcons();
+</script>
+</body>
+</html>

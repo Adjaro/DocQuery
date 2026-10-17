@@ -1,0 +1,39 @@
+<!-- @dsCard height=300 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Askelia</title>
+<style>
+html, body { margin: 0; background: var(--bg); }
+.cv { position: relative; width: 960px; height: 300px; overflow: hidden; background: var(--bg); }
+svg { position: absolute; left: 0; top: 0; }
+.ink { fill: var(--ink); } .acc { fill: var(--accent); } .soft { fill: var(--accent-soft); } .s3 { fill: var(--surface-3); } .gold { fill: var(--layer-gold); }
+.dot { fill: var(--border-strong); }
+.t { position: absolute; left: 48px; bottom: 44px; max-width: 440px; }
+.n { font-family: var(--font-sans); font-size: 104px; line-height: .95; font-weight: 600; letter-spacing: -.03em; color: var(--ink); }
+.g { font-family: var(--font-sans); font-size: 14px; line-height: 20px; color: var(--ink-3); margin-top: 14px; }
+</style></head>
+<body>
+<div class="cv">
+<!--
+  blocs : accent 192×208 (identité), ink 120×112, accent-soft 144×96, surface-3 168×64, layer-gold 48×48 (signal de couche, petit)
+  arrangement : grille modulaire affleurante, à droite de x = 480, blocs qui débordent du bord haut — comme les colonnes du lignage
+  motif : grille de points au pas space-6 (16px) — « précis, technique, mono, grille de 4px » : l'outil des data engineers
+  échelles : côtés multiples de space-6 / space-8, coins radius-md (6px), points r = 1.5
+-->
+<svg width="960" height="300" viewBox="0 0 960 300" aria-hidden="true">
+  <g id="dots"></g>
+  <rect class="acc" x="560" y="-12" width="192" height="208" rx="6"/>
+  <rect class="ink" x="768" y="-12" width="120" height="112" rx="6"/>
+  <rect class="soft" x="768" y="116" width="144" height="96" rx="6"/>
+  <rect class="s3" x="560" y="212" width="168" height="64" rx="6"/>
+  <rect class="gold" x="744" y="228" width="48" height="48" rx="6"/>
+</svg>
+<div class="t"><div class="n">Askelia</div><div class="g">L'assistant local de l'entrepôt de données de santé.</div></div>
+</div>
+<script>
+var g = document.getElementById('dots'), s = '';
+for (var x = 496; x <= 544; x += 16) for (var y = 12; y <= 292; y += 24) s += '<circle class="dot" cx="' + x + '" cy="' + y + '" r="1.5"/>';
+g.innerHTML = s;
+</script>
+</body>
+</html>

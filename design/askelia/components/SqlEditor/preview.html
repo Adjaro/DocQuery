@@ -1,0 +1,13 @@
+<!-- @dsCard group="Code" height=420 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>SqlEditor</title></head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement,A=window.Askelia;
+var sql="-- 1. Séjours 2024 avec diagnostic principal d'insuffisance cardiaque\nWITH sejours_ic AS (\n  SELECT vo.person_id, vo.visit_start_date\n  FROM omop.visit_occurrence vo\n  JOIN omop.condition_occurrence co USING (visit_occurrence_id)\n  WHERE co.condition_status_concept_id = 32902  -- diagnostic principal\n    AND vo.visit_start_date BETWEEN DATE '2024-01-01' AND DATE '2024-12-31'\n)\nSELECT COUNT(DISTINCT person_id) FROM sejours_ic;";
+ReactDOM.createRoot(document.getElementById('root')).render(h('div',{style:{padding:20}},h(A.SqlEditor,{sql:sql,title:'cohorte_ic_2024.sql',dialect:'PostgreSQL',explain:true,blocks:[{line:1,name:'sejours_ic',explain:'garde les séjours 2024 dont le diagnostic principal est une insuffisance cardiaque.'}]})));
+</script>
+</body>
+</html>

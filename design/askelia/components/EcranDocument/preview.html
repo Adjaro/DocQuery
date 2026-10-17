@@ -1,0 +1,88 @@
+<!-- @dsCard group="Écrans" height=900 width=1440 page subtitle="Document à gauche ; résumé et questions à droite, avec citations cliquables" -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Lecture d'un document</title>
+<style>
+.wrap { display: grid; grid-template-rows: 52px 1fr; height: 100%; }
+.head { display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid var(--border); }
+.head h1 { font-size: 15px; font-weight: 500; margin: 0; }
+.split { display: grid; grid-template-columns: 1fr 460px; min-height: 0; }
+.viewer { background: var(--surface-2); overflow: auto; padding: 32px; }
+.page { background: var(--surface); box-shadow: 0 0 0 1px var(--border), var(--shadow-1); padding: 48px 56px; font-size: 14px; line-height: 23px; max-width: 680px; margin: 0 auto; }
+.page h3 { font-size: 16px; margin: 0 0 12px; }
+.page h4 { font-size: 14px; margin: 24px 0 8px; }
+.page p { margin: 0 0 12px; color: var(--ink-2); }
+.page table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 8px 0 16px; }
+.page th, .page td { border-bottom: 1px solid var(--border); padding: 6px 8px 6px 0; text-align: left; }
+.page th { font-weight: 500; color: var(--ink-3); }
+.pane { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; border-left: 1px solid var(--border); }
+.pane .ak-tabs { padding: 0 24px; }
+.scroll { overflow: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.foot { padding: 12px 24px 20px; }
+</style></head>
+<body>
+<div class="ak-app" data-active="documents"><main class="ak-main" style="overflow:hidden">
+<div class="wrap">
+  <div class="head">
+    <div class="ak-crumb">Documents <i data-i="right" class="ak-ico-sm"></i></div>
+    <h1>Spec_ETL_PMSI_v3.2.pdf</h1>
+    <span class="ak-muted" style="font-size:13px">42 pages</span>
+    <span class="ak-spacer"></span>
+    <button class="ak-btn">Résumé en 30 secondes</button>
+    <button class="ak-iconbtn" aria-label="Plus d'actions"><i data-i="more"></i></button>
+  </div>
+  <div class="split">
+    <div class="viewer">
+      <article class="page">
+        <h3>3. Chargement des diagnostics PMSI MCO</h3>
+        <h4>3.1 Périmètre</h4>
+        <p>Le flux couvre les RUM transmis mensuellement par le DIM depuis le 01/01/2015. Les séjours en cours de codage sont exclus et repris au mois suivant.</p>
+        <h4>3.2 Règles d'extraction</h4>
+        <p><mark class="ak-hl" id="m1">Le diagnostic principal (DP) est lu dans la table RUM_DIAG avec type_diag = 'DP' ; les diagnostics associés significatifs (DAS) avec type_diag = 'DA'.</mark> Les diagnostics reliés (DR) sont conservés dans une colonne dédiée.</p>
+        <p>Les codes CIM-10 sont normalisés (suppression du point, majuscules) avant jointure avec le référentiel ATIH de l'année de sortie.</p>
+        <table><thead><tr><th>Champ source</th><th>Champ cible</th><th>Règle</th></tr></thead>
+        <tbody><tr><td>RUM_DIAG.code_diag</td><td>condition_source_value</td><td>Normalisation CIM-10</td></tr>
+        <tr><td>RUM_DIAG.type_diag</td><td>condition_status_concept_id</td><td>DP → 32902 ; DA → 32908</td></tr>
+        <tr><td>RUM.dt_sortie</td><td>condition_start_date</td><td>Date de sortie du RUM</td></tr></tbody></table>
+        <h4>3.3 Gestion des rejets</h4>
+        <p><mark class="ak-hl" id="m2">Un code absent du référentiel de l'année est rejeté vers la table rej_pmsi_diag avec le motif « CODE_INCONNU » ; le taux de rejet mensuel ne doit pas dépasser 5 %.</mark></p>
+        <p>Les rejets sont rejoués après la mise à jour annuelle du référentiel CIM-10.</p>
+      </article>
+    </div>
+    <section class="pane">
+      <div class="ak-tabs" role="tablist"><button class="ak-tab" role="tab" aria-selected="false">Résumé</button><button class="ak-tab" role="tab" aria-selected="true">Questions</button><button class="ak-tab" role="tab" aria-selected="false">Entités et tableaux</button></div>
+      <div class="scroll">
+        <div class="ak-you">Quelle date est utilisée pour condition_start_date, et que se passe-t-il pour un code inconnu ?</div>
+        <div class="ak-answer">
+          <p>C'est la <b>date de sortie du RUM</b>, et non la date d'entrée <button class="ak-ref" data-ref="1">1</button>.</p>
+          <p>Un code absent du référentiel ATIH de l'année est écarté dans <span class="ak-code">rej_pmsi_diag</span>. Si plus de 5 % des lignes sont rejetées dans le mois, le chargement est suspendu <button class="ak-ref" data-ref="2">2</button>.</p>
+          <div id="cites" class="ak-stack" style="gap:2px;margin:0 -12px"></div>
+          <div id="meta"></div>
+        </div>
+      </div>
+      <div class="foot"><div class="ak-composer"><textarea rows="1" placeholder="Poser une question sur ce document"></textarea><button class="ak-send" aria-label="Envoyer"><i data-i="up"></i></button></div></div>
+    </section>
+  </div>
+</div>
+</main></div>
+<script>
+Askelia.mountShell(document.querySelector('.ak-app'));
+var h = React.createElement, A = Askelia;
+var C = [
+  { n: 1, source: 'Spec_ETL_PMSI_v3.2.pdf', location: 'p. 14, §3.2' },
+  { n: 2, source: 'Spec_ETL_PMSI_v3.2.pdf', location: 'p. 14, §3.3' }
+];
+var cites = ReactDOM.createRoot(document.getElementById('cites'));
+function select(n) {
+  document.querySelectorAll('mark.ak-hl[id]').forEach(function (m) { m.classList.toggle('ak-hl-active', m.id === 'm' + n); });
+  document.querySelectorAll('.ak-ref[data-ref]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.ref == n ? 'true' : 'false'); });
+  var m = document.getElementById('m' + n); if (m) m.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  cites.render(h(React.Fragment, null, C.map(function (c) { return h(A.Citation, Object.assign({ key: c.n, active: c.n === n, onClick: function () { select(c.n); } }, c)); })));
+}
+document.querySelectorAll('.ak-ref[data-ref]').forEach(function (b) { b.onclick = function () { select(+b.dataset.ref); }; });
+select(1);
+ReactDOM.createRoot(document.getElementById('meta')).render(h(A.AnswerMeta, { reliability: 'élevée', steps: ['Recherche de « condition_start_date » dans le document', 'Lecture du tableau de correspondance (§3.2)', 'Recoupement avec la règle de rejet (§3.3)'] }));
+Askelia.hydrateIcons();
+</script>
+</body>
+</html>

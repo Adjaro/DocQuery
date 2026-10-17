@@ -1,0 +1,53 @@
+<!-- @dsCard group="Écrans" height=860 width=1440 page subtitle="Une seule barre de saisie, orientée automatiquement vers le bon module" -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Accueil</title>
+<style>
+.home { max-width: 720px; margin: 0 auto; padding: 120px 24px 48px; }
+.home h1 { text-align: center; margin-bottom: 28px; }
+.home .ak-composer { flex-direction: column; align-items: stretch; padding: 14px 14px 10px 18px; }
+.home textarea { min-height: 48px; }
+.bar { display: flex; align-items: center; gap: 4px; }
+.route { font-size: 13px; color: var(--ink-3); margin: 10px 4px 0; }
+.route b { color: var(--ink); font-weight: 500; }
+.sugg { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; justify-content: center; }
+.sugg button { height: 32px; padding: 0 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.sugg button:hover { background: var(--surface-2); color: var(--ink); }
+.recent { margin-top: 64px; }
+.recent h2 { font-size: 13px; font-weight: 500; color: var(--ink-3); margin: 0 0 8px; }
+.recent a { display: grid; grid-template-columns: 20px 1fr auto; gap: 12px; align-items: center; padding: 9px 8px; margin: 0 -8px; border-radius: var(--radius-md); color: var(--ink); text-decoration: none; font-size: 14px; }
+.recent a:hover { background: var(--surface-2); }
+.recent a .ak-ico { color: var(--ink-3); }
+.recent a span:last-child { font-size: 13px; color: var(--ink-3); }
+</style></head>
+<body>
+<div class="ak-app" data-active="accueil"><main class="ak-main">
+  <div class="home">
+    <h1 class="ak-display">Que voulez-vous savoir&nbsp;?</h1>
+    <div class="ak-composer">
+      <textarea aria-label="Votre demande" placeholder="Posez une question, décrivez une cohorte, déposez un document…">Patients de plus de 65 ans hospitalisés pour insuffisance cardiaque en 2024, avec au moins une réhospitalisation à 30 jours</textarea>
+      <div class="bar">
+        <button class="ak-iconbtn" aria-label="Joindre un document"><i data-i="clip"></i></button>
+        <span class="ak-spacer"></span>
+        <button class="ak-send" aria-label="Envoyer"><i data-i="up"></i></button>
+      </div>
+    </div>
+    <p class="route">Sera traité comme une <b>définition de cohorte</b> · <a href="#">changer</a></p>
+    <div class="sugg">
+      <button>Résumer un document</button>
+      <button>Créer une cohorte</button>
+      <button>D'où vient une colonne ?</button>
+      <button>Synthèse d'un flux</button>
+    </div>
+    <div class="recent">
+      <h2>Récents</h2>
+      <a href="#"><i data-i="query"></i><span>Cohorte IC 2024 – réhospitalisation à 30 jours</span><span>il y a 12 min</span></a>
+      <a href="#"><i data-i="doc"></i><span>Spec_ETL_PMSI_v3.2.pdf</span><span>hier</span></a>
+      <a href="#"><i data-i="lineage"></i><span>Origine des diagnostics dans condition_occurrence</span><span>hier</span></a>
+      <a href="#"><i data-i="report"></i><span>Synthèse du parcours – Diagnostics</span><span>14 oct.</span></a>
+    </div>
+  </div>
+</main></div>
+<script>Askelia.mountShell(document.querySelector('.ak-app')); Askelia.hydrateIcons();</script>
+</body>
+</html>

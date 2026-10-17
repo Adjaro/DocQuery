@@ -1,0 +1,14 @@
+<!-- @dsCard group="Données" height=130 -->
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>KpiCard</title></head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement,A=window.Askelia;
+ReactDOM.createRoot(document.getElementById('root')).render(h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:24,padding:20}},
+ h(A.KpiCard,{label:'Diagnostics reçus',value:'1,52',unit:'M',hint:'+2,1 % vs août'}),h(A.KpiCard,{label:'Codes traduits',value:'98,7',unit:'%',hint:'objectif 98 %'}),
+ h(A.KpiCard,{label:'Lignes écartées',value:'3,8',unit:'%',delta:'+0,6 pt',deltaTone:'mauvais',hint:'seuil 5 %'}),h(A.KpiCard,{label:'Patients dans la cohorte',value:'1 284'})));
+</script>
+</body>
+</html>
